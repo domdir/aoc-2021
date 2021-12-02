@@ -1,45 +1,27 @@
-use std::{
-    collections::VecDeque,
-    fs::File,
-    io::{BufRead, BufReader, Lines},
-    path::Path,
-};
+use std::collections::VecDeque;
 
-struct Solution {
-    input_lines: Lines<BufReader<File>>,
-}
+use crate::{InputLines, Solution};
 
-impl Solution {
-    const WINDOW_SIZE: usize = 3;
+const WINDOW_SIZE: usize = 3;
 
-    fn new(filename: &str) -> Solution {
-        let file = File::open(filename).unwrap();
-        let reader = BufReader::new(file);
+pub(crate) struct Day1();
 
-        Solution {
-            input_lines: reader.lines(),
-        }
-    }
-
-    fn solve(self) {
+impl Solution for Day1 {
+    fn solve(self, input_lines: InputLines) {
         let mut increases = 0;
         let mut cur_depth = usize::MAX;
-        for depth in self
-            .input_lines
+        for depth in input_lines
             .into_iter()
             .map(|line| line.unwrap())
             .map(|line| line.parse::<usize>().unwrap())
-            .scan(
-                VecDeque::with_capacity(Self::WINDOW_SIZE),
-                |values, depth| {
-                    if values.len() >= Self::WINDOW_SIZE {
-                        values.pop_front();
-                    }
-                    values.push_back(depth);
-                    Some(values.iter().sum())
-                },
-            )
-            .skip(Self::WINDOW_SIZE - 1)
+            .scan(VecDeque::with_capacity(WINDOW_SIZE), |values, depth| {
+                if values.len() >= WINDOW_SIZE {
+                    values.pop_front();
+                }
+                values.push_back(depth);
+                Some(values.iter().sum())
+            })
+            .skip(WINDOW_SIZE - 1)
         {
             if depth > cur_depth {
                 increases += 1;
@@ -49,12 +31,8 @@ impl Solution {
 
         println!("{}", increases);
     }
-}
 
-fn main() {
-    let day = 1;
-
-    let filename = format!("day{}", day);
-    let solution = Solution::new(Path::new("inputs").join(filename).to_str().unwrap());
-    solution.solve();
+    fn file_name(&self) -> &'static str {
+        "day1"
+    }
 }
