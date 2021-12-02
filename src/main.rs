@@ -3,15 +3,42 @@ use std::{
     fs::File,
     io::{BufRead, BufReader, Lines},
     path::Path,
+    str::FromStr,
 };
+
+enum Direction {
+    Forward,
+    Up,
+    Down,
+}
+
+struct Command {
+    direction: Direction,
+    value: isize,
+}
+
+impl FromStr for Command {
+    type Err = Box<dyn std::error::Error>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parts = s.split_whitespace();
+        let direction = match parts.next().unwrap() {
+            "forward" => Direction::Forward,
+            "down" => Direction::Down,
+            "up" => Direction::Up,
+            d => panic!("Invalid direction: {}", d),
+        };
+        let value = parts.next().unwrap().parse().unwrap();
+
+        Ok(Self { direction, value })
+    }
+}
 
 struct Solution {
     input_lines: Lines<BufReader<File>>,
 }
 
 impl Solution {
-    const WINDOW_SIZE: usize = 3;
-
     fn new(filename: &str) -> Solution {
         let file = File::open(filename).unwrap();
         let reader = BufReader::new(file);
@@ -22,37 +49,27 @@ impl Solution {
     }
 
     fn solve(self) {
-        let mut increases = 0;
-        let mut cur_depth = usize::MAX;
-        for depth in self
+        let mut horizontal = 0;
+        let mut depth = 0;
+        for command in self
             .input_lines
             .into_iter()
             .map(|line| line.unwrap())
-            .map(|line| line.parse::<usize>().unwrap())
-            .scan(
-                VecDeque::with_capacity(Self::WINDOW_SIZE),
-                |values, depth| {
-                    if values.len() >= Self::WINDOW_SIZE {
-                        values.pop_front();
-                    }
-                    values.push_back(depth);
-                    Some(values.iter().sum())
-                },
-            )
-            .skip(Self::WINDOW_SIZE - 1)
+            .map(|line| line.parse::<Command>().unwrap())
         {
-            if depth > cur_depth {
-                increases += 1;
+            match command.direction {
+                Direction::Forward => horizontal += command.value,
+                Direction::Up => depth -= command.value,
+                Direction::Down => depth += command.value,
             }
-            cur_depth = depth;
         }
 
-        println!("{}", increases);
+        println!("{}", horizontal * depth);
     }
 }
 
 fn main() {
-    let day = 1;
+    let day = 2;
 
     let filename = format!("day{}", day);
     let solution = Solution::new(Path::new("inputs").join(filename).to_str().unwrap());
