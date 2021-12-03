@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader, Lines},
+    io::{BufRead, BufReader},
     path::Path,
 };
 
@@ -12,17 +12,15 @@ mod day1;
 mod day2;
 mod day3;
 
-type InputLines = Lines<BufReader<File>>;
-
 trait Solution {
     fn file_name(&self) -> &'static str;
-    fn solve(self, input_lines: InputLines);
+    fn solve(self, input_lines: impl Iterator<Item = String>);
 }
 
 fn main() {
     solve(Day1());
     solve(Day2());
-    solve(Day3());
+    solve(Day3::<{ day3::MEASUREMENT_LENGTH }>());
 }
 
 fn solve(s: impl Solution) {
@@ -33,8 +31,8 @@ fn solve(s: impl Solution) {
     println!();
 }
 
-fn read_file(file_name: &str) -> InputLines {
+fn read_file(file_name: &str) -> impl Iterator<Item = String> {
     let file = File::open(file_name).unwrap();
     let reader = BufReader::new(file);
-    reader.lines()
+    reader.lines().map(|line| line.unwrap())
 }

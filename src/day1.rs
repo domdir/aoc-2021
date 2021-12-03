@@ -1,18 +1,17 @@
 use std::collections::VecDeque;
 
-use crate::{InputLines, Solution};
+use crate::Solution;
 
 const WINDOW_SIZE: usize = 3;
 
 pub(crate) struct Day1();
 
 impl Solution for Day1 {
-    fn solve(self, input_lines: InputLines) {
+    fn solve(self, input_lines: impl Iterator<Item = String>) {
         let mut increases = 0;
         let mut cur_depth = usize::MAX;
         for depth in input_lines
             .into_iter()
-            .map(|line| line.unwrap())
             .map(|line| line.parse::<usize>().unwrap())
             .scan(VecDeque::with_capacity(WINDOW_SIZE), |values, depth| {
                 if values.len() >= WINDOW_SIZE {

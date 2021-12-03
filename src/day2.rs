@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::{InputLines, Solution};
+use crate::Solution;
 
 enum Direction {
     Forward,
@@ -33,13 +33,12 @@ impl FromStr for Command {
 pub(crate) struct Day2();
 
 impl Solution for Day2 {
-    fn solve(self, input_lines: InputLines) {
+    fn solve(self, input_lines: impl Iterator<Item = String>) {
         let mut horizontal = 0;
         let mut depth = 0;
         let mut aim = 0;
         for command in input_lines
             .into_iter()
-            .map(|line| line.unwrap())
             .map(|line| line.parse::<Command>().unwrap())
         {
             match command.direction {
