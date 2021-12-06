@@ -1,4 +1,4 @@
-use crate::Solution;
+use crate::{Solution, SolutionResult};
 
 struct Board {
     grid: Vec<Vec<usize>>,
@@ -48,8 +48,8 @@ impl Board {
 pub(crate) struct Day4();
 
 impl Solution for Day4 {
-    fn solve(self, mut input_lines: impl Iterator<Item = String>) {
-        let sequence = input_lines.next().unwrap();
+    fn solve(self, mut input_lines: impl Iterator<Item = String>) -> SolutionResult {
+        let sequence = input_lines.next().ok_or("Sequence not found")?;
         // remove empty line
         input_lines.next();
         let mut boards = vec![];
@@ -65,18 +65,30 @@ impl Solution for Day4 {
                 ],
                 already_won: false,
             };
-            board.grid.push(get_board_row(&row));
-            board.grid.push(get_board_row(&input_lines.next().unwrap()));
-            board.grid.push(get_board_row(&input_lines.next().unwrap()));
-            board.grid.push(get_board_row(&input_lines.next().unwrap()));
-            board.grid.push(get_board_row(&input_lines.next().unwrap()));
+            board.grid.push(get_board_row(&row)?);
+            board.grid.push(get_board_row(
+                &input_lines.next().ok_or("2nd row of board not found")?,
+            )?);
+            board.grid.push(get_board_row(
+                &input_lines.next().ok_or("3rd row of board not found")?,
+            )?);
+            board.grid.push(get_board_row(
+                &input_lines.next().ok_or("4th row of board not found")?,
+            )?);
+            board.grid.push(get_board_row(
+                &input_lines.next().ok_or("5th row of board not found")?,
+            )?);
             boards.push(board);
             // remove empty line
             input_lines.next();
         }
         let total_boards = boards.len();
         let mut boards_won = 0;
-        for v in sequence.split(',').map(|s| s.parse::<usize>().unwrap()) {
+        for v in sequence
+            .split(',')
+            .map(|s| s.parse::<usize>())
+            .collect::<Result<Vec<_>, _>>()?
+        {
             for b in &mut boards {
                 for (i, row) in b.grid.iter().enumerate() {
                     for (j, num) in row.iter().enumerate() {
@@ -90,7 +102,7 @@ impl Solution for Day4 {
                                 }
                                 if boards_won == total_boards {
                                     println!("Score of loser: {}", b.sum_unmarked() * v);
-                                    return;
+                                    return Ok(());
                                 }
                             }
                         }
@@ -98,6 +110,7 @@ impl Solution for Day4 {
                 }
             }
         }
+        Err("Not enough numbers in the sequence".into())
     }
 
     fn file_name(&self) -> &'static str {
@@ -105,15 +118,18 @@ impl Solution for Day4 {
     }
 }
 
-fn get_board_row(input: &str) -> Vec<usize> {
+fn get_board_row(input: &str) -> Result<Vec<usize>, String> {
     let mut parts = input
         .split_whitespace()
-        .map(|f| f.parse::<usize>().unwrap());
-    vec![
-        parts.next().unwrap(),
-        parts.next().unwrap(),
-        parts.next().unwrap(),
-        parts.next().unwrap(),
-        parts.next().unwrap(),
-    ]
+        .map(|f| f.parse::<usize>())
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|op| format!("Unable to parse board row parts: {}", op))?
+        .into_iter();
+    Ok(vec![
+        parts.next().ok_or("1st board row part not found")?,
+        parts.next().ok_or("2nd board row part not found")?,
+        parts.next().ok_or("3rd board row part not found")?,
+        parts.next().ok_or("4th board row part not found")?,
+        parts.next().ok_or("5th board row part not found")?,
+    ])
 }

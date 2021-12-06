@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::Solution;
+use crate::{Solution, SolutionResult};
 
 enum Direction {
     Forward,
@@ -18,13 +18,13 @@ impl FromStr for Command {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parts = s.split_whitespace();
-        let direction = match parts.next().unwrap() {
+        let direction = match parts.next().ok_or("No direction found")? {
             "forward" => Direction::Forward,
             "down" => Direction::Down,
             "up" => Direction::Up,
             d => panic!("Invalid direction: {}", d),
         };
-        let value = parts.next().unwrap().parse().unwrap();
+        let value = parts.next().ok_or("No value found")?.parse()?;
 
         Ok(Self { direction, value })
     }
@@ -33,13 +33,14 @@ impl FromStr for Command {
 pub(crate) struct Day2();
 
 impl Solution for Day2 {
-    fn solve(self, input_lines: impl Iterator<Item = String>) {
+    fn solve(self, input_lines: impl Iterator<Item = String>) -> SolutionResult {
         let mut horizontal = 0;
         let mut depth = 0;
         let mut aim = 0;
         for command in input_lines
             .into_iter()
-            .map(|line| line.parse::<Command>().unwrap())
+            .map(|line| line.parse::<Command>())
+            .collect::<Result<Vec<_>, _>>()?
         {
             match command.direction {
                 Direction::Forward => {
@@ -52,6 +53,7 @@ impl Solution for Day2 {
         }
 
         println!("{}", horizontal * depth);
+        Ok(())
     }
 
     fn file_name(&self) -> &'static str {

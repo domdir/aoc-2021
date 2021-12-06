@@ -1,4 +1,5 @@
 use std::{
+    error::Error,
     fs::File,
     io::{BufRead, BufReader},
     path::Path,
@@ -10,6 +11,7 @@ use day3::Day3;
 use day4::Day4;
 use day5::Day5;
 use day6::Day6;
+use day7::Day7;
 
 mod day1;
 mod day2;
@@ -17,10 +19,13 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
+
+type SolutionResult = Result<(), Box<dyn Error>>;
 
 trait Solution {
     fn file_name(&self) -> &'static str;
-    fn solve(self, input_lines: impl Iterator<Item = String>);
+    fn solve(self, input_lines: impl Iterator<Item = String>) -> SolutionResult;
 }
 
 fn main() {
@@ -30,18 +35,35 @@ fn main() {
     solve(Day4());
     solve(Day5());
     solve(Day6());
+    solve(Day7());
 }
 
 fn solve(s: impl Solution) {
     let file_name = s.file_name();
-    let input_lines = read_file(Path::new("inputs").join(file_name).to_str().unwrap());
+    let input_path = Path::new("inputs").join(file_name);
+    let path = match input_path.to_str() {
+        Some(p) => p,
+        None => {
+            println!("Unable to create path to input file: {}", file_name);
+            return;
+        }
+    };
+    let input_lines = match read_file(path) {
+        Ok(it) => it,
+        Err(e) => {
+            println!("Unable to read file {}: {}", path, e);
+            return;
+        }
+    };
     println!("Solving {}:", file_name);
-    s.solve(input_lines);
+    if let Err(e) = s.solve(input_lines) {
+        println!("Error: {}", e)
+    }
     println!();
 }
 
-fn read_file(file_name: &str) -> impl Iterator<Item = String> {
-    let file = File::open(file_name).unwrap();
+fn read_file(file_name: &str) -> Result<impl Iterator<Item = String>, std::io::Error> {
+    let file = File::open(file_name)?;
     let reader = BufReader::new(file);
-    reader.lines().map(|line| line.unwrap())
+    Ok(reader.lines().filter_map(|line| line.ok()))
 }

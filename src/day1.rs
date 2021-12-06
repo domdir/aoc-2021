@@ -1,13 +1,13 @@
 use std::collections::VecDeque;
 
-use crate::Solution;
+use crate::{Solution, SolutionResult};
 
 const WINDOW_SIZE: usize = 3;
 
 pub(crate) struct Day1();
 
 impl Solution for Day1 {
-    fn solve(self, input_lines: impl Iterator<Item = String>) {
+    fn solve(self, input_lines: impl Iterator<Item = String>) -> SolutionResult {
         let mut increases = 0;
         let mut cur_depth = usize::MAX;
         for depth in input_lines
@@ -29,6 +29,7 @@ impl Solution for Day1 {
         }
 
         println!("{}", increases);
+        Ok(())
     }
 
     fn file_name(&self) -> &'static str {

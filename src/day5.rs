@@ -1,20 +1,27 @@
-use crate::Solution;
+use crate::{Solution, SolutionResult};
 
 pub(crate) struct Day5();
 
 impl Solution for Day5 {
-    fn solve(self, input_lines: impl Iterator<Item = String>) {
+    fn solve(self, input_lines: impl Iterator<Item = String>) -> SolutionResult {
         let mut map_without_diagonals = vec![vec![0; 1_000]; 1_000];
         let mut map_with_diagonals = vec![vec![0; 1_000]; 1_000];
-        for ((from_x, from_y), (to_x, to_y)) in input_lines.map(|line| {
-            let mut parts = line.split(" -> ").map(|parts| {
-                let mut p = parts
-                    .split(",")
-                    .map(|parts| parts.parse::<usize>().unwrap());
-                (p.next().unwrap(), p.next().unwrap())
-            });
-            (parts.next().unwrap(), parts.next().unwrap())
-        }) {
+        for ((from_x, from_y), (to_x, to_y)) in input_lines
+            .map(|line| {
+                let mut parts = line.split(" -> ").filter_map(|parts| {
+                    let mut p = parts
+                        .split(",")
+                        .map(|parts| parts.parse::<usize>())
+                        .collect::<Result<Vec<_>, _>>()
+                        .ok()?
+                        .into_iter();
+                    Some((p.next()?, p.next()?))
+                });
+                Some((parts.next()?, parts.next()?))
+            })
+            .collect::<Option<Vec<_>>>()
+            .ok_or("Not enough parts")?
+        {
             if from_x == to_x {
                 for i in if from_y < to_y {
                     from_y..=to_y
@@ -55,6 +62,7 @@ impl Solution for Day5 {
         println!("Count without diagonals: {}", count_without_diagonals);
         let count_with_diagonals = count_overlaps(&map_with_diagonals);
         println!("Count with diagonals: {}", count_with_diagonals);
+        Ok(())
     }
 
     fn file_name(&self) -> &'static str {
