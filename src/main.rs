@@ -9,12 +9,14 @@ use day2::Day2;
 use day3::Day3;
 use day4::Day4;
 use day5::Day5;
+use day6::Day6;
 
 mod day1;
 mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 trait Solution {
     fn file_name(&self) -> &'static str;
@@ -27,6 +29,7 @@ fn main() {
     solve(Day3::<{ day3::MEASUREMENT_LENGTH }>());
     solve(Day4());
     solve(Day5());
+    solve(Day6());
 }
 
 fn solve(s: impl Solution) {
