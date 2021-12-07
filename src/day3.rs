@@ -1,5 +1,6 @@
 use crate::{Solution, SolutionResult};
 
+#[allow(dead_code)]
 pub(crate) const MEASUREMENT_LENGTH: usize = 12;
 
 pub(crate) struct Day3<const L: usize>();

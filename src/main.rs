@@ -1,17 +1,11 @@
+#![feature(int_abs_diff)]
+
 use std::{
     error::Error,
     fs::File,
     io::{BufRead, BufReader},
     path::Path,
 };
-
-use day1::Day1;
-use day2::Day2;
-use day3::Day3;
-use day4::Day4;
-use day5::Day5;
-use day6::Day6;
-use day7::Day7;
 
 mod day1;
 mod day2;
@@ -29,13 +23,16 @@ trait Solution {
 }
 
 fn main() {
-    solve(Day1());
-    solve(Day2());
-    solve(Day3::<{ day3::MEASUREMENT_LENGTH }>());
-    solve(Day4());
-    solve(Day5());
-    solve(Day6());
-    solve(Day7());
+    #[cfg(feature = "all")]
+    {
+        solve(day1::Day1());
+        solve(day2::Day2());
+        solve(day3::Day3::<{ day3::MEASUREMENT_LENGTH }>());
+        solve(day4::Day4());
+        solve(day5::Day5());
+        solve(day6::Day6());
+    }
+    solve(day7::Day7());
 }
 
 fn solve(s: impl Solution) {
