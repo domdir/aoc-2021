@@ -14,6 +14,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 type SolutionResult = Result<(), Box<dyn Error>>;
 
@@ -31,8 +32,9 @@ fn main() {
         solve(day4::Day4());
         solve(day5::Day5());
         solve(day6::Day6());
+        solve(day7::Day7());
     }
-    solve(day7::Day7());
+    solve(day8::Day8());
 }
 
 fn solve(s: impl Solution) {
