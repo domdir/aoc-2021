@@ -10,6 +10,7 @@ use std::{
 mod day1;
 mod day10;
 mod day11;
+mod day12;
 mod day2;
 mod day3;
 mod day4;
@@ -39,8 +40,9 @@ fn main() {
         solve(day8::Day8());
         solve(day9::Day9());
         solve(day10::Day10());
+        solve(day11::Day11());
     }
-    solve(day11::Day11());
+    solve(day12::Day12());
 }
 
 fn solve(s: impl Solution) {
