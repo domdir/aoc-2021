@@ -7,7 +7,12 @@ pub(crate) struct Day14();
 impl Solution for Day14 {
     fn solve(self, mut input_lines: impl Iterator<Item = String>) -> SolutionResult {
         let mut counts: HashMap<u8, usize> = HashMap::new();
-        let t = input_lines.next().ok_or("No input")?.chars().map(|f| f as u8).collect::<Vec<_>>();
+        let t = input_lines
+            .next()
+            .ok_or("No input")?
+            .chars()
+            .map(|f| f as u8)
+            .collect::<Vec<_>>();
         t.iter().for_each(|c| {
             *counts.entry(*c).or_insert(0) += 1;
         });
